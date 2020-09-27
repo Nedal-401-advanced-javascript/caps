@@ -1,0 +1,25 @@
+{
+  "name": "caps",
+  "version": "1.0.0",
+  "description": "system that emulates a real world supply chain. this will be an event driven application that “distributes” the responsibility for logging to separate modules, using only events to trigger logging based on activity.",
+  "main": "caps.js",
+  "scripts": {
+    "test": "jest --verbose --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nedal-401-advanced-javascript/caps.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nedal-401-advanced-javascript/caps/issues"
+  },
+  "homepage": "https://github.com/Nedal-401-advanced-javascript/caps#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "faker": "^5.1.0",
+    "jest": "^26.4.2"
+  }
+}
