@@ -17,18 +17,16 @@ server.on('connection', (socket) => {
     socketPool[id] = socket;
     socket.on('data', buffer => {
         // encoded buffer
-        console.log("buffer >>>> ", buffer);
-        if (buffer.event && buffer.payload) {
-
-            // parse buffer
-            let msg = JSON.parse(buffer.toString());
-            console.log("msg >>> ", msg);
-            broadcast(msg);
-            
-        } else {
-            console.log('check the data if it reseved right >>>>>>>>>><<<<<<<');
-        }
+        // console.log("buffer >>>> ", buffer);
+        let msg = JSON.parse(buffer.toString());
+        console.log("msg >>> ", msg);
+        broadcast(msg);
+        
     });
+});
+
+server.on('error', (e)=> {
+    console.log("ERROR !!!!!!! ", e)
 })
 
 function broadcast(msg) {

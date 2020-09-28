@@ -2,15 +2,21 @@
 
 const net = require('net')
 const driver = new net.Socket();
+const host = process.env.HOST || 'localhost';
+const port = process.env.PORT || 4000;
 
+driver.connect(port, host, () => {
+    console.log("driver connecting ... ")
+});
+driver.on('close', function () {
+    console.log("connection is closed!!");
+});
 
 driver.on('data', (data) => {
     let jsonData = JSON.parse(data);
     if (jsonData.event==='pickup'){
         handlePickup(jsonData)
         handleDelevry(jsonData)
-        console.log(`thank you for delivering ${jsonData.payload.orderId}`);
-        console.log(new Date());
     }
 });
 
@@ -18,20 +24,19 @@ driver.on('data', (data) => {
 
 function handlePickup(jsonData) {
     setTimeout(() => {
-        console.log(`DRIVER: picked up [${jsonData.payload.orderId}]`);
+        console.log(`DRIVER: picked up [${jsonData.payload.orderId}]`,new Date());
         jsonData.event='in-transit';
-        vendor.write(JSON.stringify(jsonData))
+        driver.write(JSON.stringify(jsonData))
     }, 1000);
 }
 
 
 
 
-function handleDelevry(payload) {
+function handleDelevry(jsonData) {
     setTimeout(() => {
-        jsonData.event='delivered';
-        
-        vendor.write(JSON.stringify(jsonData))
+        jsonData.event='delivered';  
+        driver.write(JSON.stringify(jsonData))
     }, 3000);
 }
 

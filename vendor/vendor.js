@@ -3,7 +3,7 @@ require('dotenv').config()
 var faker = require('faker');
 
 //Connect to the CAPS server
-const net = requirt('net');
+const net = require('net');
 const vendor = new net.Socket();
 
 const storeName = process.env.store_name;
@@ -13,14 +13,15 @@ const port = process.env.PORT || 4000;
 vendor.connect(port, host, () => {
     console.log("Vendor connecting ... ")
 });
-
+vendor.on('close', function () {
+    console.log("connection is closed!!");
+});
 
 
 vendor.on('data', (data) => {
     let jsonData = JSON.parse(data);
     if (jsonData.event === 'delivered') {
-        console.log(`thank you for delivering ${jsonData.payload.orderId}`);
-        console.log(new Date());
+        console.log(`thank you for delivering ${jsonData.payload.orderId}`,new Date());
     }
 });
 
@@ -35,17 +36,6 @@ setInterval(() => {
         }
     }
     vendor.write(JSON.stringify(msg))
-}, 5000);
+}, 30000);
 
 
-// send the event 
-// vendor.on('pickup', handlePickup);
-// // events.emit('pickup',obj)
-
-// function handlePickup(payload) {
-//     setTimeout(() => {
-//         console.log(`DRIVER: picked up [${payload.orderId}]`);
-//         vendor.write(msg)
-//     }, 1000);
-// }
-module.exports = obj;
