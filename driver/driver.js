@@ -1,42 +1,29 @@
 'use strict';
 
-const net = require('net')
-const driver = new net.Socket();
-const host = process.env.HOST || 'localhost';
-const port = process.env.PORT || 4000;
 
-driver.connect(port, host, () => {
-    console.log("driver connecting ... ")
-});
-driver.on('close', function () {
-    console.log("connection is closed!!");
-});
+const io = require('socket.io-client')
+const driver = io.connect('http://localhost:3000/caps');
 
-driver.on('data', (data) => {
-    let jsonData = JSON.parse(data);
-    if (jsonData.event==='pickup'){
-        handlePickup(jsonData)
-        handleDelevry(jsonData)
-    }
-});
+driver.on('connect', () => {
+    console.log("[driver] I am ready to delever your packegs !!! ");
+
+    driver.on('pickup', payload => {
+        handlePickup(payload)
+        handleDelevry(payload)
+    })
+})
 
 
-
-function handlePickup(jsonData) {
+function handlePickup(payload) {
     setTimeout(() => {
-        console.log(`DRIVER: picked up [${jsonData.payload.orderId}]`,new Date());
-        jsonData.event='in-transit';
-        driver.write(JSON.stringify(jsonData))
-    }, 1000);
+        console.log(`DRIVER: picked up [${payload.orderId}]`, new Date());
+        driver.emit('in-transit', payload)
+    }, 1500);
 }
 
 
-
-
-function handleDelevry(jsonData) {
+function handleDelevry(payload) {
     setTimeout(() => {
-        jsonData.event='delivered';  
-        driver.write(JSON.stringify(jsonData))
+        driver.emit('delivered', payload)
     }, 3000);
 }
-
