@@ -4,31 +4,41 @@
  * accept all inbound events and data,validate them
  * broadcast to everyone except the sender
  */
-// const net = require('net')
-// const server = net.createServer()
-const port = process.env.PORT || 4000;
-const io=require('socket.oi')(port)
 
-io.on('connection',(socket)=>{
-    console.log("CAPS Connection!")
-})
-let currentRoom='';
+// const port = process.env.PORT || 4000;
+const io = require('socket.io')(3000)
 const caps = io.of('/caps')
-caps.on('join',room=>{
-    caps.leave(currentRoom);
-    caps.join(room);
 
-    caps.on('pickup', payload=>{
-        caps.to(currentRoom).emit('pickup',payload)
-        // caps.broadcast.emit('pickup',payload)
+io.on('connection', (socket) => {
+    console.log("Welcome to our system, we care about you!", socket.id)
+});
+caps.on('connection', socket => {
 
+    let currentRoom = '';
+    socket.on('join', room => {
+        // console.log('>>>>>>>>>>>>>>>>>>>');
+        socket.leave(currentRoom);
+        socket.join(room);
+        currentRoom = room;
+        // console.log(currentRoom,"<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        // caps.emit('action', `Someone Joined Room : ${currentRoom}`);
+        // caps.to(`${socket.id}`).emit('joined', room);
+
+        socket.on('pickup', payload => {
+            console.log('>>> pickup <<<', payload);
+            caps.emit('pickup', payload)
+
+        });
+    })
+    socket.on('in-transit', payload => {
+        console.log('>>> in-transit <<<',currentRoom);
+        caps.in(currentRoom).emit('in-transit', payload)
     });
-    caps.on('in-transit', payload=>{
-        caps.to(currentRoom).emit('in-transit',payload)
+    socket.on('delivered', payload => {
+        console.log('>>> delivered <<<');
+        caps.in(currentRoom).emit('delivered', payload)
     });
-    caps.on('delivered', payload=>{
-        caps.to(currentRoom).emit('delivered',payload)
-    });
+
 })
 
 // server.listen(port, () => console.log(`server is running on ${port}`));
@@ -45,7 +55,7 @@ caps.on('join',room=>{
 //         let msg = JSON.parse(buffer.toString());
 //         console.log("msg >>> ", msg);
 //         broadcast(msg);
-        
+
 //     });
 // });
 
@@ -59,7 +69,3 @@ caps.on('join',room=>{
 //         socketPool[id].write(payload);
 //     }
 // }
-
-
-
-
